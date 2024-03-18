@@ -1,5 +1,3 @@
-
-import useUserStore from '@/store/modules/user'
 /**
  * 在不同项目中可能需要进行重新配置的数据
  */
@@ -10,7 +8,6 @@ export class JStaker {
         }
         // 需要初始化或者默认设置的值
         const { projectName = "未填写", basicPath = "http://172.16.1.2:13124/api", token } = params;
-        // this.userStore = userStore || new useUserStore();
         this.BASIC_API = basicPath; // 需要替换成实际的值
         this.TOKEN = token || "Wzssdy20240312"; // 需要替换成实际的值
         this.projectName = projectName || "洞头城南片区小流域防洪排涝系统";
