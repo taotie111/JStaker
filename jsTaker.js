@@ -4,13 +4,20 @@ import useUserStore from '@/store/modules/user'
  * 在不同项目中可能需要进行重新配置的数据
  */
 export class JStaker {
-    constructor(userStore, projectName, basicPath, token) {
+    constructor(params = {}, settings = {}) {
+        if (!params) {
+            params = {}
+        }
         // 需要初始化或者默认设置的值
-        this.userStore = userStore || new useUserStore();
-        this.BASIC_API = basicPath || "http://172.16.1.2:13124/api"; // 需要替换成实际的值
+        const { projectName = "未填写", basicPath = "http://172.16.1.2:13124/api", token } = params;
+        // this.userStore = userStore || new useUserStore();
+        this.BASIC_API = basicPath; // 需要替换成实际的值
         this.TOKEN = token || "Wzssdy20240312"; // 需要替换成实际的值
         this.projectName = projectName || "洞头城南片区小流域防洪排涝系统";
-        this.uid = this.userStore.name || "未登录";
+        this.uid = "未登录";
+        this.settings = settings;
+
+        this.handleSettings();
     }
 
     // 用户二次登录后需要对信息进行验证
@@ -18,12 +25,72 @@ export class JStaker {
         this.uid = uid;
     }
 
+    // 处理一些基础配置问题
+    /**
+     * isHandleApiCode：是否需要处理API返回的code
+     */
+    handleSettings() {
+        if (!this.settings) {
+            this.settings = {};
+        }
+        let { isHandleApiCode = false } = this.settings;
+        this.isHandleApiCode = isHandleApiCode;
+    }
+
     //初始化全局监控
     globalMonitor() {
-        if (import.meta.env.VITE_APP_ENV === 'development') {
-            return false;
-        }
+        // if (import.meta.env.VITE_APP_ENV === 'development') {
+        //     return false;
+        // }
+        var that = this;
         var errorData = {};
+
+        // 保存原始的XMLHttpRequest对象
+        var originalXhr = window.XMLHttpRequest;
+
+        // 重写XMLHttpRequest对象的原型方法
+        function CustomXMLHttpRequest() {
+            var xhr = new originalXhr();
+            var requestParams = {}; // 保存请求参数
+
+            // 保存请求参数
+            xhr.open = function (method, url, async) {
+                requestParams.method = method;
+                requestParams.url = url;
+                requestParams.async = async;
+                originalXhr.prototype.open.apply(xhr, arguments);
+            };
+
+            // 重写send方法，保存POST请求的输入参数
+            var originalSend = xhr.send;
+            xhr.send = function (data) {
+                requestParams.data = data;
+                originalSend.call(xhr, data);
+            };
+
+            // 添加自定义的回调函数
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        if (!that.isHandleApiCode) {
+                            let res = JSON.parse(xhr.response);
+                            if (res.code !== 200) {
+                                that.errorJStaker({ type: 2, errorFunction: requestParams.url, errorPageUrl: "apiError：服务器已返回", errorFunctionParams: requestParams, errorMsg: xhr.response });
+                            }
+                        }
+                    } else {
+                        that.errorJStaker({ type: 2, errorFunction: requestParams.url, errorPageUrl: "apiError: 请求服务器错误", errorFunctionParams: requestParams, errorMsg: xhr.response });
+                        console.error('请求失败', requestParams, xhr);
+                    }
+                }
+            };
+
+            return xhr;
+        }
+
+        // 覆盖全局的XMLHttpRequest对象
+        window.XMLHttpRequest = CustomXMLHttpRequest;
+
         window.onerror = (message, source, lineno, colno, error) => {
             var errorInfo = {
                 message: message,
@@ -36,6 +103,7 @@ export class JStaker {
             this.errorJStaker({ type: 2, errorFunction: "globalError", errorPageUrl: "globalError", errorFunctionParams: errorData });
             return false;
         };
+
     }
 
 
@@ -77,11 +145,16 @@ export class JStaker {
         this.JStakerRequest(params);
     }
 
+
+
     /**
      * 由于异常上报都是 POST 请求
      * @param {*} params // 上传的参数  
      */
     JStakerRequest(params) {
+        // if (import.meta.env.VITE_APP_ENV === 'development') {
+        //     return false;
+        // }
         const apiPath = this.getAPIPath(params.type);
         let xhr = new XMLHttpRequest();
         xhr.open('POST', this.BASIC_API + apiPath, true);
@@ -127,5 +200,3 @@ export class JStaker {
     }
 }
 
-const jstaker = new JStaker();
-jstaker.globalMonitor();
