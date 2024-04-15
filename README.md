@@ -43,6 +43,29 @@ JStaker 是一个用于监控和上报前端异常和性能数据的工具。它
    jstaker.globalMonitor();
    ```
 
+### 插件全局注册（内置）
+```
+import { setUpJSTaker } from 'jstaker';
+const app = createApp(App)
+setUpJSTaker(app, {projectName:"洞头城南片区防洪排涝系统",basicPath:"https://jstaker.wzsly.cn/api" },{isHandleApiCode: true})
+```
+注册参数说明
+ |参数	 |类型 |	约束 |	备注 |
+| --- | --- | --- | --- |
+ |projectName	 |String	 |不可为空 |	项目名称 |
+ |basicPath	 |string	可为空	 |项目基础路径默认为"https://jstaker.wzsly.cn/api" |
+			
+			
+			
+注册设置说明
+ |参数	 |类型 |	约束 |	备注 |
+| --- | --- | --- | --- |
+|isHandleApiCode|	Boolean	|可为空	|是否监听所有的接口报错默认为false，可能会有一定的性能开销|
+			
+			
+			
+			
+
 ## 使用示例
 
 以下是一个使用示例：
