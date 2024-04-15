@@ -1,4 +1,21 @@
 /**
+ * 组件注册
+ */
+export function setUpJSTaker(app,params,settings){
+    const jsTaker = new JStaker(params,settings);
+    jsTaker.globalMonitor();
+    //全局变量挂载
+    app.config.errorHandler = (err, vm, info) => {
+        // 在这里处理错误，例如日志记录或向用户显示错误信息
+        console.error('Global Error Handler:', err, vm, info);
+        setTimeout(() => {
+        throw err
+        })
+    };
+    app.config.globalProperties.JSTaker = jsTaker;
+    return jsTaker;
+}
+/**
  * 在不同项目中可能需要进行重新配置的数据
  */
 export class JStaker {
@@ -7,7 +24,9 @@ export class JStaker {
             params = {}
         }
         // 需要初始化或者默认设置的值
-        const { projectName = "未填写", basicPath = "http://172.16.1.2:13124/api", token } = params;
+        // 内网地址： http://172.16.1.2:13124/api
+        // 外网地址：jstaker.wzsly.cn
+        const { projectName = "未填写", basicPath = "https://jstaker.wzsly.cn/api", token } = params;
         this.BASIC_API = basicPath; // 需要替换成实际的值
         this.TOKEN = token || "Wzssdy20240312"; // 需要替换成实际的值
         this.projectName = projectName || "洞头城南片区小流域防洪排涝系统";
@@ -149,9 +168,10 @@ export class JStaker {
      * @param {*} params // 上传的参数  
      */
     JStakerRequest(params) {
-        // if (import.meta.env.VITE_APP_ENV === 'development') {
-        //     return false;
-        // }
+
+        if (params.type == 2 && params.errorFunction && params.errorFunction.includes("weblog/push") ) {
+            return false;
+        }
         const apiPath = this.getAPIPath(params.type);
         let xhr = new XMLHttpRequest();
         xhr.open('POST', this.BASIC_API + apiPath, true);

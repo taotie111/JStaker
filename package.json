@@ -1,0 +1,19 @@
+{
+  "name": "jstaker",
+  "version": "1.0.4",
+  "description": "JSTaker",
+  "main": "jsTaker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taotie111/JStaker.git"
+  },
+  "author": "runzhu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/taotie111/JStaker/issues"
+  },
+  "homepage": "https://github.com/taotie111/JStaker#readme"
+}
