@@ -156,6 +156,11 @@ export class JStaker {
         });
     }
 
+
+    // TODO 资源加载监测
+
+    // TODO 点击埋点统计
+    
     // 异常上报
     errorJStaker(params) {
         this.JStakerRequest(params);
