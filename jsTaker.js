@@ -32,7 +32,7 @@ export class JStaker {
         this.projectName = projectName || "洞头城南片区小流域防洪排涝系统";
         this.uid = "未登录";
         this.settings = settings;
-
+        this.clickStatus = false;
         this.handleSettings();
     }
 
@@ -160,7 +160,15 @@ export class JStaker {
     // TODO 资源加载监测
 
     // TODO 点击埋点统计
-    
+    uvStatistics(){
+        // 点击是否正在上报
+        if (clickStatus){
+            return "数据处理中";
+        }
+        
+        
+    }
+
     // 异常上报
     errorJStaker(params) {
         this.JStakerRequest(params);
