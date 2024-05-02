@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/taotie111/JStaker/issues"
   },
-  "homepage": "https://github.com/taotie111/JStaker#readme"
+  "homepage": "https://github.com/taotie111/JStaker#readme",
+  "dependencies": {
+    "axios": "^1.6.8"
+  }
 }
