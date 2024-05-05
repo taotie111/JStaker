@@ -158,7 +158,9 @@ export class JStaker {
 
 
     // TODO 资源加载监测
-
+    scriptMonitoring(){
+        
+    }
     // TODO 点击埋点统计
     uvStatistics(){
         // 点击是否正在上报
