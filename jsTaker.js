@@ -161,7 +161,10 @@ export class JStaker {
     scriptMonitoring(){
         
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 005fdb246f09cd91ff06c38ff96848c87607207a
     // TODO 点击埋点统计
     uvStatistics(){
         // 点击是否正在上报
