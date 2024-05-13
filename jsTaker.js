@@ -168,7 +168,8 @@ export class JStaker {
         if (clickStatus){
             return "数据处理中";
         }
-        
+        // 上传点击统计事件
+        this.upClick(type,clickName,time)
         
     }
 
@@ -178,7 +179,12 @@ export class JStaker {
     }
 
 
+    /**
+     * 埋点上报
+     */
+    upClick(type, clickName, time){
 
+    }
     /**
      * 由于异常上报都是 POST 请求
      * @param {*} params // 上传的参数  
