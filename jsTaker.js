@@ -1,15 +1,16 @@
+import { request } from './request'
 /**
  * 组件注册
  */
-export function setUpJSTaker(app,params,settings){
-    const jsTaker = new JStaker(params,settings);
+export function setUpJSTaker(app, params, settings) {
+    const jsTaker = new JStaker(params, settings);
     jsTaker.globalMonitor();
     //全局变量挂载
     app.config.errorHandler = (err, vm, info) => {
         // 在这里处理错误，例如日志记录或向用户显示错误信息
         console.error('Global Error Handler:', err, vm, info);
         setTimeout(() => {
-        throw err
+            throw err
         })
     };
     app.config.globalProperties.JSTaker = jsTaker;
@@ -33,7 +34,11 @@ export class JStaker {
         this.uid = "未登录";
         this.settings = settings;
         this.clickStatus = false;
+        this.ip = null
         this.handleSettings();
+        if (this.isTrackClick){
+            document.addEventListener('click', this.trackClickEvent.bind(this));
+        }
     }
 
     // 用户二次登录后需要对信息进行验证
@@ -49,8 +54,9 @@ export class JStaker {
         if (!this.settings) {
             this.settings = {};
         }
-        let { isHandleApiCode = false } = this.settings;
+        let { isHandleApiCode = false, isTrackClick = false } = this.settings;
         this.isHandleApiCode = isHandleApiCode;
+        this.isTrackClick = isTrackClick;
     }
 
     //初始化全局监控
@@ -158,22 +164,28 @@ export class JStaker {
 
 
     // TODO 资源加载监测
-    scriptMonitoring(){
-        
-    }
-<<<<<<< HEAD
+    scriptMonitoring() {
+        // 创建一个 PerformanceObserver 来监测资源加载
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                console.log('Resource loaded:', entry.name, 'Type:', entry.entryType);
+                // 你可以根据需要处理每个资源加载的详细信息
+                // 例如，entry.startTime, entry.duration, entry.initiatorType 等
+            }
+        });
 
-=======
->>>>>>> 005fdb246f09cd91ff06c38ff96848c87607207a
+        // 配置 PerformanceObserver 来监测 'resource' 类型的事件
+        observer.observe({ entryTypes: ['resource'] });
+    }
     // TODO 点击埋点统计
-    uvStatistics(){
+    trackClickEvent(clickName,message) {
         // 点击是否正在上报
-        if (clickStatus){
+        if (clickStatus) {
             return "数据处理中";
         }
         // 上传点击统计事件
-        this.upClick(type,clickName,time)
-        
+        this.upClick(clickName,message)
+
     }
 
     // 异常上报
@@ -185,8 +197,18 @@ export class JStaker {
     /**
      * 埋点上报
      */
-    upClick(type, clickName, time){
-
+    upClick( clickName, message) {
+        const params = {
+            token: "",
+            url: "",
+            params: {
+                clickName: clickName,
+                uid: this.uid,
+                message: message,
+                token: this.token,
+            }
+        }
+        request(params)
     }
     /**
      * 由于异常上报都是 POST 请求
@@ -194,7 +216,7 @@ export class JStaker {
      */
     JStakerRequest(params) {
 
-        if (params.type == 2 && params.errorFunction && params.errorFunction.includes("weblog/push") ) {
+        if (params.type == 2 && params.errorFunction && params.errorFunction.includes("weblog/push")) {
             return false;
         }
         const apiPath = this.getAPIPath(params.type);
