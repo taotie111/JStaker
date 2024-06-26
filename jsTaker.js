@@ -14,6 +14,8 @@ export function setUpJSTaker(app, params, settings) {
         })
     };
     app.config.globalProperties.JSTaker = jsTaker;
+    // 注册自定义组件
+    customElements.define('pv-div', PVDIV);
     return jsTaker;
 }
 /**
@@ -27,16 +29,16 @@ export class JStaker {
         // 需要初始化或者默认设置的值
         // 内网地址： http://172.16.1.2:13124/api
         // 外网地址：jstaker.wzsly.cn
-        const { projectName = "未填写", basicPath = "https://jstaker.wzsly.cn/api", token } = params;
+        const { projectName = "未填写", basicPath = "https://jstaker.wzsly.cn/api", token, user } = params;
         this.BASIC_API = basicPath; // 需要替换成实际的值
         this.TOKEN = token || "Wzssdy20240312"; // 需要替换成实际的值
         this.projectName = projectName || "洞头城南片区小流域防洪排涝系统";
-        this.uid = "未登录";
+        this.uid = user || "未登录";
         this.settings = settings;
         this.clickStatus = false;
         this.ip = null
         this.handleSettings();
-        if (this.isTrackClick){
+        if (this.isTrackClick) {
             document.addEventListener('click', this.trackClickEvent.bind(this));
         }
     }
@@ -178,13 +180,13 @@ export class JStaker {
         observer.observe({ entryTypes: ['resource'] });
     }
     // TODO 点击埋点统计
-    trackClickEvent(clickName,message) {
+    trackClickEvent(clickName, message) {
         // 点击是否正在上报
         if (clickStatus) {
             return "数据处理中";
         }
         // 上传点击统计事件
-        this.upClick(clickName,message)
+        this.upClick(clickName, message)
 
     }
 
@@ -197,7 +199,7 @@ export class JStaker {
     /**
      * 埋点上报
      */
-    upClick( clickName, message) {
+    upClick(clickName, message) {
         const params = {
             token: "",
             url: "",
@@ -208,7 +210,8 @@ export class JStaker {
                 token: this.token,
             }
         }
-        request(params)
+        const img = new Image();
+        img.src = `${this.BASIC_API} + "/weblog/uv/getUVdataList"?event=${eventName}&params=${encodeURIComponent(JSON.stringify(params))}`;
     }
     /**
      * 由于异常上报都是 POST 请求
@@ -263,4 +266,3 @@ export class JStaker {
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
     }
 }
-
