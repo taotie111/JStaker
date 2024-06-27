@@ -210,6 +210,7 @@ export class JStaker {
                 token: this.token,
             }
         }
+        // 新建图片地址用于上报
         const img = new Image();
         img.src = `${this.BASIC_API} + "/weblog/uv/getUVdataList"?event=${eventName}&params=${encodeURIComponent(JSON.stringify(params))}`;
     }
