@@ -201,18 +201,14 @@ export class JStaker {
      */
     upClick(clickName, message) {
         const params = {
-            token: "",
-            url: "",
-            params: {
-                clickName: clickName,
-                uid: this.uid,
-                message: message,
-                token: this.token,
-            }
+            token: this.token,
+            uid: this.uid,
+            message: message,
+            clickName: clickName,
         }
         // 新建图片地址用于上报
         const img = new Image();
-        img.src = `${this.BASIC_API} + "/weblog/uv/getUVdataList"?event=${eventName}&params=${encodeURIComponent(JSON.stringify(params))}`;
+        img.src = `${this.BASIC_API} + "/weblog/uv/getUVdataList"?params=${encodeURIComponent(JSON.stringify(params))}`;
     }
     /**
      * 由于异常上报都是 POST 请求
