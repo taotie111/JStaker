@@ -111,3 +111,7 @@ try {
 
 - 邮箱：1023931586@qq.com
 - GitHub 仓库：[项目链接](https://github.com/taotie111/JStaker.git)
+
+## upload
+#### 1.0.5
+将 pv 上报的方式从普通请求改为 img ，防止跨域问题和渲染阻塞问题
