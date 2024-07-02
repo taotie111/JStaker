@@ -1,4 +1,3 @@
-import { request } from './request'
 /**
  * 组件注册
  */
@@ -14,8 +13,7 @@ export function setUpJSTaker(app, params, settings) {
         })
     };
     app.config.globalProperties.JSTaker = jsTaker;
-    // 注册自定义组件
-    customElements.define('pv-div', PVDIV);
+
     return jsTaker;
 }
 /**
@@ -38,6 +36,8 @@ export class JStaker {
         this.clickStatus = false;
         this.ip = null
         this.handleSettings();
+        console.log("初始化")
+        this.upClick("初始化上报","初始化")
         if (this.isTrackClick) {
             document.addEventListener('click', this.trackClickEvent.bind(this));
         }
@@ -197,7 +197,7 @@ export class JStaker {
 
 
     /**
-     * 埋点上报
+     * 全局页面曝光 统计页面 PV 
      */
     upClick(clickName, message) {
         const params = {
@@ -208,7 +208,7 @@ export class JStaker {
         }
         // 新建图片地址用于上报
         const img = new Image();
-        img.src = `${this.BASIC_API} + "/weblog/uv/getUVdataList"?params=${encodeURIComponent(JSON.stringify(params))}`;
+        img.src = `${this.BASIC_API}/weblog/uv/uploadUV?params=${encodeURIComponent(JSON.stringify(params))}`;
     }
     /**
      * 由于异常上报都是 POST 请求
