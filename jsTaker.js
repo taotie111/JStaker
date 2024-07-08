@@ -37,7 +37,7 @@ export class JStaker {
         this.ip = null
         this.handleSettings();
         console.log("初始化")
-        this.upClick("初始化上报","初始化")
+        this.upClick("洞头城南片区防洪排涝系统","初始化曝光")
         if (this.isTrackClick) {
             document.addEventListener('click', this.trackClickEvent.bind(this));
         }
@@ -155,6 +155,7 @@ export class JStaker {
         }
         // 计算所用时间
         let duration = endTime.getTime() - startTime.getTime();
+        // TODO 将这些参数转化为用 img 来上报
         this.JStakerRequest({
             type: 1,
             startTime: this.JStakerFormatDate(startTime),
@@ -197,11 +198,11 @@ export class JStaker {
 
 
     /**
-     * 全局页面曝光 统计页面 PV 
+     * 埋点上报
      */
     upClick(clickName, message) {
         const params = {
-            token: this.token,
+            token: this.TOKEN,
             uid: this.uid,
             message: message,
             clickName: clickName,
