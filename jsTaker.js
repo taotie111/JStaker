@@ -27,7 +27,7 @@ export class JStaker {
         // 需要初始化或者默认设置的值
         // 内网地址： http://172.16.1.2:13124/api
         // 外网地址：jstaker.wzsly.cn
-        const { projectName = "未填写", basicPath = "https://jstaker.wzsly.cn/api", token, user } = params;
+        const { projectName = "未填写", basicPath = "https://jstaker-screen.wzsly.cn/api", token, user } = params;
         this.BASIC_API = basicPath; // 需要替换成实际的值
         this.TOKEN = token || "Wzssdy20240312"; // 需要替换成实际的值
         this.projectName = projectName || "洞头城南片区小流域防洪排涝系统";
@@ -37,7 +37,7 @@ export class JStaker {
         this.ip = null
         this.handleSettings();
         console.log("初始化")
-        this.upClick("洞头城南片区防洪排涝系统","初始化曝光")
+        this.upClick("洞头城南片区防洪排涝系统", "初始化曝光");
         if (this.isTrackClick) {
             document.addEventListener('click', this.trackClickEvent.bind(this));
         }
@@ -196,20 +196,75 @@ export class JStaker {
         this.JStakerRequest(params);
     }
 
+    /**
+     * UV 上报
+     * 查看页面是否有 visitId 在 localStorage 中
+     * 如果没有则新建并直接上报一次 UV ,并在lastVisitTime 中记录时间
+     * 如果有则读取 lastVisitTime，如果超过 24 小时，则上报一次 UV,并在lastVisitTime 中更新记录
+     */
+    uvMonitoring() {
+        const visitId = localStorage.getItem('visitId');
+        const lastVisitTime = localStorage.getItem('lastVisitTime');
+        const currentTime = new Date().getTime();
+
+        if (!visitId) {
+            // 如果没有 visitId，则新建并直接上报一次 UV
+            const newVisitId = this.generateVisitId();
+            localStorage.setItem('visitId', newVisitId);
+            this.reportUv(newVisitId);
+            localStorage.setItem('lastVisitTime', currentTime);
+            return;
+        }
+        const lastVisitTime = localStorage.getItem('lastVisitTime');
+        if (currentTime - lastVisitTime > 86400000) {
+            // 如果超过一天，则上报一次 UV
+            this.reportUv(visitId);
+            localStorage.setItem('lastVisitTime', currentTime);
+        }
+        return;
+    }
+    /**
+     * uv 上报方法
+     */
+    reportUv(visitId) {
+        const params = {
+            token: this.TOKEN,
+            uid: this.uid,
+            visitId: visitId,
+        };
+
+        const url = `${this.BASIC_API}/weblog/uv/uploadUV?params=${encodeURIComponent(JSON.stringify(params))}&callback=callbackFunction`;
+        window.callbackFunction = function (response) {
+            // 在这里处理服务器返回的数据
+            console.log(response);
+        };
+        const script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
+        return;
+    }
 
     /**
      * 埋点上报
      */
     upClick(clickName, message) {
+        console.log("upClick")
         const params = {
             token: this.TOKEN,
             uid: this.uid,
             message: message,
             clickName: clickName,
-        }
-        // 新建图片地址用于上报
-        const img = new Image();
-        img.src = `${this.BASIC_API}/weblog/uv/uploadUV?params=${encodeURIComponent(JSON.stringify(params))}`;
+        };
+
+        const url = `${this.BASIC_API}/weblog/uv/uploadUV?params=${encodeURIComponent(JSON.stringify(params))}&callback=callbackFunction`;
+        // 创建一个全局回调函数，用于处理服务器返回的数据
+        window.callbackFunction = function (response) {
+            // 在这里处理服务器返回的数据
+            console.log(response);
+        };
+        const script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
     }
     /**
      * 由于异常上报都是 POST 请求
